@@ -1,7 +1,7 @@
 # based on http://docs.docker.com/examples/postgresql_service/
 
 FROM ubuntu:14.04
-MAINTAINER YIng Liu - www.MindIsSoftware.com 
+MAINTAINER Ying Liu - www.MindIsSoftware.com 
 
 # Configure locale
 RUN locale-gen en_US.UTF-8 && update-locale
@@ -14,7 +14,7 @@ RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get install -y postgresql-9.3 postgresql-contrib-9.3
 
-# Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
+# Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package 
 USER postgres
 
 # Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
