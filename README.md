@@ -14,3 +14,9 @@ It exposes three volumes:
 
 The database directory is /var/lib/postgresql/9.3/data. 
 
+To pull and run it
+
+    docker run --name postgres -p 5432:5432 -d yingliu4203/postgresql:9.3 
+
+It listens on the host port 5432 so that it can be remotely managed by pgAdmin.
+
