@@ -3,6 +3,12 @@
 FROM ubuntu:14.04
 MAINTAINER Ying Liu - www.MindIsSoftware.com 
 
+ENV APP_DB_USER odoo
+ENV APP_DB_PASSWORD 'odoo' 
+
+# !!! EXPOSE port doesn's support ENV variable, has to change EXPOSE command
+ENV APP_DB_PORT 5432
+
 # Configure locale
 RUN locale-gen en_US.UTF-8 && update-locale
 RUN echo 'LANG="en_US.UTF-8"' > /etc/default/locale
@@ -17,21 +23,19 @@ RUN apt-get install -y postgresql-9.3 postgresql-contrib-9.3
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package 
 USER postgres
 
-# Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
-# then create a database `docker` owned by the ``docker`` role.
+# Create a PostgreSQL role 
 # Note: here we use ``&&\`` to run commands one after the other - the ``\``
 #       allows the RUN command to span multiple lines.
-RUN    /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER odoodba WITH SUPERUSER PASSWORD 'odoodba';" &&\
-    createdb -O odoodba odoodba &&\
+RUN /etc/init.d/postgresql start &&\
+    psql -e --command "CREATE USER $APP_DB_USER WITH SUPERUSER PASSWORD $APP_DB_PASSWORD" &&\
+    createdb -O $APP_DB_USER $APP_DB_USER &&\
     /etc/init.d/postgresql stop
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible. 
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
-
-# And add ``listen_addresses`` to ``/etc/postgresql/9.3/main/postgresql.conf``
 RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
+RUN sed -i "s/port = .*/port = $APP_DB_PORT/g" /etc/postgresql/9.3/main/postgresql.conf
 
 # Expose the PostgreSQL port
 EXPOSE 5432
